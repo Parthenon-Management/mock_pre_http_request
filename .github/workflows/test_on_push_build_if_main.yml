@@ -1,0 +1,96 @@
+name: Test_On_Push_Build_If_Main
+on: [push]
+jobs:
+  php8_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: actions/checkout@v2
+      - name: Setup PHP with PECL extension
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0.0'
+      - name: Install Composer dependencies
+        run: |
+          composer install
+      - name: Tests
+        run: ./www/wp-content/plugins/mock_pre_http_request/src/vendor/bin/phpunit --config=www/wp-content/plugins/mock_pre_http_request/tests/phpunit.xml
+      - name: Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          files: ./www/wp-content/plugins/mock_pre_http_request/tests/clover.xml # optional
+  php74_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: actions/checkout@v2
+      - name: Setup PHP with PECL extension
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+      - name: Install Composer dependencies
+        run: |
+          composer install
+      - name: Tests
+        run: ./www/wp-content/plugins/mock_pre_http_request/src/vendor/bin/phpunit --config=www/wp-content/plugins/mock_pre_http_request/tests/phpunit.xml
+      - name: Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          files: ./www/wp-content/plugins/mock_pre_http_request/tests/clover.xml # optional
+  build:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: [php8_test, php74_tests]
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Read Version Number
+        id: versioning
+        uses: paulhatch/semantic-version@v4.0.2
+        with:
+          tag_prefix: "v"
+          major_pattern: "(MAJOR)"
+          minor_pattern: "(MINOR)"
+          format: "${major}.${minor}.${patch}"
+          search_commit_body: false
+          user_format_type: "csv"
+      - uses: rickstaa/action-create-tag@v1
+        with:
+          tag: v${{ steps.versioning.outputs.version }}
+          message: v${{ steps.versioning.outputs.version }}
+      - name: Update Plugin Version In PHP
+        run: |
+          cur_ver=${{ steps.versioning.outputs.version }};
+          sed -i 's/0.0.0/'"$cur_ver"'/g' 'www/wp-content/plugins/mock_pre_http_request/mock_pre_http_request.php'
+      - name: Build
+        run: |
+          sed -i 's/www\/wp-content\/plugins\/mock_pre_http_request\///g' 'composer.json'
+          mv composer.json www/wp-content/plugins/mock_pre_http_request/
+          composer install --no-dev --working-dir=www/wp-content/plugins/mock_pre_http_request/
+          rm -fr www/wp-content/plugins/tests/
+          mkdir build
+      - name: Install Zip
+        uses: montudor/action-zip@v0.1.0
+      - name: Zip output
+        run: |
+          pushd www/wp-content/plugins/
+          zip -r mock_pre_http_request.${{ steps.versioning.outputs.version }}.zip mock_pre_http_request/
+          popd
+      - uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: v${{ steps.versioning.outputs.version }}
+          prerelease: false
+          title: Release ${{ steps.versioning.outputs.version }}
+          files: |
+            www/wp-content/plugins/mock_pre_http_request.${{ steps.versioning.outputs.version }}.zip
+          id: automatic_release

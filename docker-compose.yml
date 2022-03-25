@@ -1,0 +1,45 @@
+version: "3.2"
+services:
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mock_pre_http_requestdocker
+    volumes:
+      - ./:/var/www/html
+      - ./www/wp-admin:/var/www/html/www/wp-admin:cached
+      - ./www/wp-includes:/var/www/html/www/wp-includes:cached
+      - ./www/wp-content/themes/Divi:/var/www/html/www/wp-content/themes/Divi:cached
+      - ./www/wp-content/plugins/mock_pre_http_request/src/vendor:/var/www/html/www/wp-content/plugins/mock_pre_http_request/src/vendor:cached
+    ports:
+      - "80:80"
+      - "443:443"
+    container_name: mock_pre_http_requestdocker
+  mysql:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_USER=test
+      - MYSQL_PASSWORD=test
+      - MYSQL_DATABASE=test_db
+      - MAX_CONNECTIONS=100000
+      - MAX_ALLOWED_PACKET=128M
+      - WAIT_TIMEOUT=1000
+    volumes:
+      - "./scripts/:/docker-entrypoint-initdb.d/"
+    container_name: mysqlmock_pre_http_request
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:4.7
+    depends_on:
+      - mysql
+    ports:
+      - "8082:80"
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+    volumes:
+      - /sessions
+    container_name: phpmyadminmock_pre_http_request
+volumes:
+  mysql_volume:
+  php_volume:

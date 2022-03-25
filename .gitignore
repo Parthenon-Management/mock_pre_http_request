@@ -1,0 +1,20 @@
+/.idea/
+composer.lock
+#ignore wp core install
+
+#ignore wp core
+www/*
+#dont ignore wp-config.php used by the docker container
+!www/wp-config.php
+#dont ignore the db.php for sqlite droppin used by the unit tests
+!www/wp-content/
+www/wp-content/*
+!www/wp-content/db.php
+#dont ignore the plugin
+!www/wp-content/plugins
+www/wp-content/plugins/*
+!www/wp-content/plugins/mock_pre_http_request
+#do ignore the vendor folder
+www/wp-content/plugins/mock_pre_http_request/src/vendor
+
+*.phpunit.result.cache
