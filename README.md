@@ -1,5 +1,7 @@
 # mock_pre_http_request
-For mocking wordpress pre_http_request sequentially for testing integration to remote API.
+> :warning: **UNDER CONSTRUCTION** 
+> 
+> This plugin currently doesnt do anything
 - Wordpress has a filter called pre_http_request that is hit on any usage of wp_remote_request and acts a short-curcuit. If the filter returns false it continues,  but if returns an array it doesnt complete the request and returns that array as the response.
 ## Goal
 Make it easier for test frameworks (ie. selnium) to more accurately simulate a production environment via a remote testing server.
