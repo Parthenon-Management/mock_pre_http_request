@@ -21,5 +21,3 @@ class Plugin {
 
 	}
 }
-$plugin = new Plugin();
-$plugin->run_plugin();
