@@ -10,6 +10,7 @@ class Plugin {
         add_shortcode('test_shortcode321',function ($atts,$content){
             return 'TEST_'.$content.'_TEST';
         });
+        Post_Type::register();
 	}
 	private function register_pre_http_hook(){
 		
