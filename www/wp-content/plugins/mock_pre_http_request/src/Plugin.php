@@ -7,18 +7,15 @@ class Plugin {
 		$this->activation_upgrade_hooks();
 		$this->register_rest_endpoints();
 		$this->register_pre_http_hook();
-        add_shortcode('test_shortcode321',function ($atts,$content){
-            return 'TEST_'.$content.'_TEST';
-        });
-        Post_Type::register();
+		add_shortcode( 'test_shortcode321', function ( $attr, $content ) {
+			return 'TEST_' . $content . '_TEST';
+		} );
+		Post_Type::register();
 	}
-	private function register_pre_http_hook(){
-		
+	private function register_pre_http_hook() {
 	}
-	private function activation_upgrade_hooks(){
-		
+	private function activation_upgrade_hooks() {
 	}
-	private function register_rest_endpoints(){
-
+	private function register_rest_endpoints() {
 	}
 }
