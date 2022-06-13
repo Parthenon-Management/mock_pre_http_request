@@ -9,7 +9,6 @@ services:
       - ./:/var/www/html
       - ./www/wp-admin:/var/www/html/www/wp-admin:cached
       - ./www/wp-includes:/var/www/html/www/wp-includes:cached
-      - ./www/wp-content/themes/Divi:/var/www/html/www/wp-content/themes/Divi:cached
       - ./www/wp-content/plugins/mock_pre_http_request/src/vendor:/var/www/html/www/wp-content/plugins/mock_pre_http_request/src/vendor:cached
     ports:
       - "80:80"
