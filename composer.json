@@ -23,7 +23,8 @@
     "johnpbloch/wordpress": "5.9.3",
     "phpunit/phpunit": "9.5.*",
     "gschechter/wp-phpunit": "*",
-    "yoast/phpunit-polyfills": "*"
+    "yoast/phpunit-polyfills": "*",
+    "wp-coding-standards/wpcs": "*"
   },
   "require": {
     "php": ">=7.4",
